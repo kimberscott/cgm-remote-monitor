@@ -16,15 +16,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
-        mongodb-version: [4.2, 4.4]
+        node-version: [20, 22, 24]
+        mongodb-version: [4.4, 5.0, 6.0]
+    env:
+      # Temporary: Allow Node 20 until branch protection rules are updated
+      # See: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -60,7 +64,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASS }}
       - name: Clean git Checkout
         if: success()
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build, tag and push the dev Docker image
         if: success() && github.ref == 'refs/heads/dev'
         uses: docker/build-push-action@v2
